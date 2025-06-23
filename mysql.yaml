@@ -39,12 +39,3 @@
     ansible.builtin.command: mysql_secure_installation --set-root-pass {{ mysql_root_password }}
     when: mysql_info.failed is true
 
-  - name: Enter the mysql commands
-    ansible.builtin.debug:
-      msg: "{{ item }}"
-    loop:
-    - mysql
-    - show databases;
-    - use sys;
-    - show tables;
-    
