@@ -6,7 +6,7 @@
   tasks:
   - name: Install mysql server
     ansible.builtin.package:
-      name: mysql-server -y
+      name: mysql-server 
       state: present
 
   - name: Enable and restart mysql service
