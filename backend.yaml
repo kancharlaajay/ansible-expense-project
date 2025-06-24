@@ -41,6 +41,14 @@
       name: npm
       path: /app
 
+  - name: Install python libraries
+    ansible.builtin.pip:
+      name: "{{ item }}"
+      executable: pip3.9
+    loop:
+    - PyMySQL
+    - cryptography
+    
   - name: copy backend.service
     ansible.builtin.copy:
       src: backend.service
