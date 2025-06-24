@@ -46,10 +46,14 @@
       src: backend.service
       dest: /etc/systemd/system/backend.service
 
-  - name: Import mysql schema
-    ansible.builtin.command: "mysql -h 172.31.19.155 -uroot -pExpenseApp@1 < /app/schema/backend.sql"
-    register: import_mysql_info
-    ignore_errors: "true"
+  - name: import mysql data
+    community.mysql.mysql_db:
+      state: import
+      name: all
+      login_user: root
+      login_password: ExpenseApp@1
+      login_host: 172.31.19.155
+      target: /app/schema/backend.sql
 
   - name: print the output
     ansible.builtin.debug:
