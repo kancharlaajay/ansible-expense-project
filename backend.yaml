@@ -1,0 +1,63 @@
+- name: configure backend 
+  hosts: backend
+  become: yes
+  tasks:
+  - name: disable nodejs version
+    ansible.builtin.command: dnf module disable nodejs -y
+  
+  - name: enable nodejs:20 version
+    ansible.builtin.command: dnf module enable nodejs:20 -y 
+
+  - name: Install node js package
+    ansible.builtin.package:
+      name: "{{ item}}"
+      state: present
+    loop:
+    - npm
+    - mysql
+
+  - name: Add daemon user to run the application
+    ansible.builtin.user:
+      name: expense
+
+  - name: setup an app directory
+    ansible.builtin.file:
+      path: /app
+      state: directory
+  
+  - name: Download the backend code
+    ansible.builtin.get_url:
+      url: https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip
+      dest: /tmp/backend.zip
+
+  - name: Unarchive a file that is already on the remote machine
+    ansible.builtin.unarchive:
+      src: /tmp/backend.zip
+      dest: /app
+      remote_src: yes
+
+  - name: Install npm dependencies
+    community.general.npm:
+      name: npm
+      path: /app
+
+  - name: copy backend.service
+    ansible.builtin.copy:
+      src: backend.service
+      dest: /etc/systemd/system/backend.service
+
+  - name: Import mysql schema
+    ansible.builtin.command: "mysql -h 172.31.19.155 -uroot -pExpenseApp@1 < /app/schema/backend.sql"
+    register: import_mysql_info
+    ignore_errors: "true"
+
+  - name: print the output
+    ansible.builtin.debug:
+      msg: "Import mysql info {{ import_mysql_info }}"
+
+  - name: Daemon reload and enable service
+    ansible.builtin.systemd_service:
+      daemon_reload: "true"
+      enabled: "true"
+      state: restarted
+      name: backend
