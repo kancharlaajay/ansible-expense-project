@@ -48,7 +48,7 @@
     loop:
     - PyMySQL
     - cryptography
-    
+
   - name: copy backend.service
     ansible.builtin.copy:
       src: backend.service
@@ -62,10 +62,6 @@
       login_password: ExpenseApp@1
       login_host: 172.31.19.155
       target: /app/schema/backend.sql
-
-  - name: print the output
-    ansible.builtin.debug:
-      msg: "Import mysql info {{ import_mysql_info }}"
 
   - name: Daemon reload and enable service
     ansible.builtin.systemd_service:
