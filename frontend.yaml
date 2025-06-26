@@ -12,6 +12,12 @@
       name: nginx
       state: started
       enabled: yes
+    register: nginx_info
+    ignore_errors: yes
+
+  - name: print the output
+    ansible.builtin.debug:
+     msg: Nginx info {{ nginx_info }}
 
   - name: delete html directory
     ansible.builtin.file:
